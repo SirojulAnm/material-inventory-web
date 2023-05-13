@@ -4,6 +4,8 @@ import axios from "axios";
 import { useSetRecoilState } from 'recoil';
 import { useHistory } from 'react-router-dom';
 import { tokenState } from './../../store/index.js';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Login() {
     const history = useHistory();
@@ -25,23 +27,28 @@ function Login() {
         try {
             const response = await axios.post('v1/login', JSON.stringify(payload));
             const data = response.data;
-            setToken({
-                check: true,
-                user: data.data
-            })
             const saveStorage = {
                 check: true,
                 user: data.data
             }
+            setToken(saveStorage)
             localStorage.setItem('tokenStorage', JSON.stringify(saveStorage));
-            history.replace('/dashboard');
-        } catch (event) {
-            console.log(event.message);
+            history.replace('/materials');
+            toast.info(data.meta.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
+        } catch (error) {
+            toast.error(error.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
         }
     }
 
     return (
         <div className="container">
+            <ToastContainer />
             <div className="row justify-content-center align-items-center">
                 <div className="col-md-6">
                     <div className="card mt-5">

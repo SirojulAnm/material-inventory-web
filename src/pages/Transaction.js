@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { tokenState } from '../store/index.js';
 import { useRecoilValue } from "recoil";
+import { ToastContainer, toast } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Transaction() {
+    const history = useHistory();
     const getToken = useRecoilValue(tokenState);
+    const token = getToken ? getToken.user.token : '';
     const [quantity, setQuantity] = useState(0);
     const [warehouseCategory, setWarehouseCategory] = useState('');
     
@@ -13,7 +18,7 @@ function Transaction() {
     useEffect(() => {
         axios.get('/v1/materials', {
             headers: {
-                Authorization: `${getToken.user.user.token}`
+                Authorization: `${token}`
             }
         })
         .then(response => {
@@ -22,14 +27,14 @@ function Transaction() {
         .catch(error => {
             console.log(error);
         });
-    }, [getToken.user.user.token]);
+    }, [token]);
 
     const [officer, setOfficer] = useState([]);
     const [selectedOfficer, setSelectedOfficer] = useState('');
     useEffect(() => {
         axios.get('/v1/warehouse-officer', {
             headers: {
-                Authorization: `${getToken.user.user.token}`
+                Authorization: `${token}`
             }
         })
         .then(response => {
@@ -38,9 +43,8 @@ function Transaction() {
         .catch(error => {
             console.log(error);
         });
-    }, [getToken.user.user.token]);
+    }, [token]);
 
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -51,30 +55,39 @@ function Transaction() {
             warehouse_category: warehouseCategory
         };
 
-        console.log(transactionData);
         axios.post('v1/transaction-submit', JSON.stringify(transactionData), {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `${getToken.user.user.token}`
+                'Authorization': `${token}`
             }
         })
         .then(response => {
-            console.log(response.data);
-            setIsSubmitted(true);
+            toast.info(response.data.meta.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
+            setQuantity(0);
+            setWarehouseCategory('');
+            setSelectedMaterial('');
+            setSelectedOfficer('');
+            history.replace('/transaction-list');
         })
         .catch(error => {
-            console.log(error.message);
+            toast.error(error.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
         });
     }
 
     return (
         <div className="container">
+            <ToastContainer />
             <div className="row justify-content-center align-items-center">
                 <div className="col-md-12">
                     <div className="card mt-5">
                         <div className="card-header">Material Transaksi</div>
                         <div className="card-body">
-                        {isSubmitted ? (<p> The Form Has Been Submitted! </p>) : (
                         <form className="form-horizontal" onSubmit={handleSubmit}>
                             <div className="form-group row mt-3">
                             <label htmlFor="materials" className="col-sm-3 col-form-label">Choose a material:</label>
@@ -120,7 +133,6 @@ function Transaction() {
                                 </div>
                             </div>
                         </form>
-                        )}
                         </div>
                     </div>
                 </div>

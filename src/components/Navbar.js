@@ -1,33 +1,49 @@
 import React from 'react';
-import {NavLink} from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import axios from "axios";
 import { tokenState } from '../store/index.js';
 import { useSetRecoilState, useRecoilValue } from "recoil";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Navbar() {
     const setToken = useSetRecoilState(tokenState);
     const getToken = useRecoilValue(tokenState);
+    const history = useHistory();
 
     const logout = async () => {
-        localStorage.removeItem('tokenStorage');
         try {
             let response = await axios.get('v1/logout', {
                 headers: {
-                    Authorization: `${getToken.user.user.token}`
+                    Authorization: `${getToken.user.token}`
                 }
             })
-            console.log(response.data.meta.message);
-            setToken({
-                check: false,
-                user: []
-            })
-        } catch (event) {
-            console.log(event.message)
+            toast.info(response.data.meta.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
+            setToken({ check: false, user: [] })
+            localStorage.removeItem('tokenStorage');
+        } catch (error) {
+            toast.error(error.message, {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
+            if (error.response && error.response.status === 401) {
+                history.replace('/login');
+                setToken({ check: false, user: [] })
+                localStorage.removeItem('tokenStorage');
+            }
         }
     }
 
+    // console.log(getToken);
+    // const dataStorage = JSON.parse(localStorage.getItem('tokenStorage'));
+    // console.log(dataStorage)
+
     return (
         <div>
+            <ToastContainer />
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary border-bottom py-3 mb-4">
                 <div className="container-fluid">
                     <NavLink className="navbar-brand" to="/">MIS</NavLink>
