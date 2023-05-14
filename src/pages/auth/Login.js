@@ -39,10 +39,12 @@ function Login() {
                 autoClose: 2000
             });
         } catch (error) {
-            toast.error(error.message, {
-                position: toast.POSITION.TOP_CENTER,
-                autoClose: 2000
-            });
+            if (error.response.data.meta.message) {
+                toast.error(error.response.data.meta.message, {
+                    position: toast.POSITION.TOP_CENTER,
+                    autoClose: 2000
+                });
+            }
         }
     }
 
@@ -71,7 +73,11 @@ function Login() {
                                         <input type="password" className="form-control" id="inputPassword3" placeholder="Password" ref={passwordInputRef} />
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary mt-3">Login</button>
+                                <div className="form-group row mt-4">
+                                    <div className="col-sm-9 offset-sm-3">
+                                        <button type="submit" className="btn btn-primary">Login</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

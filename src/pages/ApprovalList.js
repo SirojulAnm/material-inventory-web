@@ -5,31 +5,31 @@ import { tokenState } from '../store/index.js';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-function TransactionList() {
+function ApprovalList() {
     const getToken = useRecoilValue(tokenState);
     const setToken = useSetRecoilState(tokenState);
     const history = useHistory();
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
-
+  
     useEffect(() => {
-        axios.get('v1/submission-list', {
+        axios.get('v1/recipient-list', {
             headers: {
                 Authorization: `${getToken.user.token}`
             }
         })
-        .then(response => {
-            setData(response.data.data);
-        })
-        .catch(error => {
-            if (error.response && error.response.status === 401) {
-                history.replace('/login');
-                setToken({ check: false, user: [] })
-                localStorage.removeItem('tokenStorage');
-            }
-        });
+            .then(response => {
+                setData(response.data.data);
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 401) {
+                    history.replace('/login');
+                    setToken({ check: false, user: [] })
+                    localStorage.removeItem('tokenStorage');
+                }
+            });
     }, [getToken.user.token, history, setToken]);
-
+  
     const filteredData = data.filter(item => item.Material.Name.toLowerCase().includes(search.toLowerCase()));
     const columns = [
         {
@@ -57,9 +57,24 @@ function TransactionList() {
             selector: row => row.WarehouseCategory,
             sortable: true,
         },
+        {
+            name: '',
+            cell: row => (
+                row.Status === 'receive' ?
+                    <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => history.push(`/approval/${row.ID}`)}
+                    >
+                    Proses
+                    </button>
+                : null
+            ),
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+        },
     ];
-      
-
+  
     return (
         <div className="container">
             <div className="row justify-content-center align-items-center">
@@ -74,6 +89,6 @@ function TransactionList() {
             </div>
         </div>
     );
-}
+}  
 
-export default TransactionList;
+export default ApprovalList;

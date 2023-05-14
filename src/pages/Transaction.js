@@ -73,10 +73,12 @@ function Transaction() {
             history.replace('/transaction-list');
         })
         .catch(error => {
-            toast.error(error.message, {
-                position: toast.POSITION.TOP_CENTER,
-                autoClose: 2000
-            });
+            if (error.response.data.meta.message) {
+                toast.error(error.response.data.meta.message, {
+                    position: toast.POSITION.TOP_CENTER,
+                    autoClose: 2000
+                });
+            }
         });
     }
 

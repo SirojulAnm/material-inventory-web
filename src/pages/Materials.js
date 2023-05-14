@@ -22,7 +22,6 @@ function Materials() {
             setData(response.data.data);
         })
         .catch(error => {
-            console.log(error);
             if (error.response && error.response.status === 401) {
                 history.replace('/login');
                 setToken({ check: false, user: [] })
