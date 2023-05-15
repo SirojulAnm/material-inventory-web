@@ -7,7 +7,7 @@ function Home() {
                 <div className="col text-center">
                     <h5>Welcome To Material Inventory System (MIS)</h5>
                     <img
-                        src="http://localhost:8000/images/diagram.png" // Replace with the actual path to your image
+                        src="http://sirojulanam.com:8000/images/diagram.png" // Replace with the actual path to your image
                         className="img-fluid rounded mt-3 mb-5"
                         alt="Diagram Material Inventory System"
                     />
