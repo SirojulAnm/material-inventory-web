@@ -58,6 +58,15 @@ function ApprovalList() {
             sortable: true,
         },
         {
+            name: 'Updated',
+            selector: row => {
+                const date = new Date(row.UpdatedAt);
+                const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+                return formattedDate;
+            },
+            sortable: true,
+        },
+        {
             name: '',
             cell: row => (
                 row.Status === 'receive' ?
